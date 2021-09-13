@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 io.on('connection', (socket: Socket)=>{
     console.log('a user connected')
 })
-const PORT = process.env.PORT || 3009
-server.listen(PORT, () => {
+
+server.listen(3009, () => {
     console.log('listening on *:3009');
 });
