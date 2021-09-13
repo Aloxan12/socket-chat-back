@@ -1,21 +1,39 @@
-import express from 'express';
-import http from 'http'
-import socketio, {Socket} from 'socket.io'
+import cors from 'cors';
+import express from 'express'
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+import {v1} from "uuid";
 
 
 const app = express();
-const server = http.createServer(app);
-// @ts-ignore
-const io = socketio(server)
+const httpServer = createServer(app);
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello Vika</h1>');
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+    },
+});
+const PORT = process.env.PORT || 3900;
+
+app.use(cors())
+app.get('/', ((req, res) => {
+    res.send('Hello vik')
+}))
+
+
+const messages = [
+    {message: 'Hello, Vika', id: v1(), user: {id: v1(), name: 'Alex'}},
+    {message: 'Hello, Alex', id: v1(), user: {id: v1(), name: 'Viktoria'}}
+]
+
+io.on("connection", (socketChannel) => {
+    console.log('user a connected')
+    socketChannel.on('client-message-send', (message: string)=>{
+        console.log(message)
+    })
+    socketChannel.emit('init-messages-published', messages)
 });
 
-io.on('connection', (socket: Socket)=>{
-    console.log('a user connected')
-})
-
-server.listen(3009, () => {
-    console.log('listening on *:3009');
+httpServer.listen(PORT,()=>{
+    console.log(`Port con *:${PORT}`)
 });
