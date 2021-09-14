@@ -27,11 +27,16 @@ const messages = [
 ]
 
 io.on("connection", (socketChannel) => {
-    console.log('user a connected')
-    socketChannel.on('client-message-send', (message: string)=>{
-        console.log(message)
+
+    socketChannel.on('client message sent', (message: string)=>{
+        let messageItem = {message: message, id: v1(), user: {id: v1(), name: 'Alex'}}
+        messages.push(messageItem)
+
+        io.emit('new-message-sent', messageItem)
     })
     socketChannel.emit('init-messages-published', messages)
+
+    console.log('user a connected')
 });
 
 httpServer.listen(PORT,()=>{
