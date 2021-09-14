@@ -29,6 +29,9 @@ const messages = [
 io.on("connection", (socketChannel) => {
 
     socketChannel.on('client message sent', (message: string)=>{
+        if(typeof message !== 'string'){
+            return
+        }
         let messageItem = {message: message, id: v1(), user: {id: v1(), name: 'Alex'}}
         messages.push(messageItem)
 
