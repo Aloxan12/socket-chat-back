@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
         origin: "*",
     },
 });
-const PORT = process.env.PORT || 3900;
+const PORT = process.env.PORT || 3500;
 
 app.use(cors())
 app.get('/', ((req, res) => {
