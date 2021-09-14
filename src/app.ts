@@ -26,13 +26,29 @@ const messages = [
     {message: 'Hello, Alex', id: v1(), user: {id: v1(), name: 'Viktoria'}}
 ]
 
+const usersState = new Map();
+
 io.on("connection", (socketChannel) => {
 
-    socketChannel.on('client message sent', (message: string)=>{
+    usersState.set(socketChannel, {id: v1(), name: 'Anonym'})
+
+    io.on('disconnect', ()=>{
+        usersState.delete(socketChannel);
+    })
+
+    socketChannel.on('client-message-sent', (name:string)=>{
+        const user = usersState.get(socketChannel)
+        user.name = name;
+    })
+
+    socketChannel.on('client-message-sent', (message: string)=>{
         if(typeof message !== 'string'){
             return
         }
-        let messageItem = {message: message, id: v1(), user: {id: v1(), name: 'Alex'}}
+
+        const user = usersState.get(socketChannel)
+
+        let messageItem = {message: message, id: v1(), user: {id: user.id, name: user.name}}
         messages.push(messageItem)
 
         io.emit('new-message-sent', messageItem)
