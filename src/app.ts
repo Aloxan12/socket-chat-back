@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
         origin: "*",
     },
 });
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3900;
 
 app.use(cors())
 app.get('/', ((req, res) => {
@@ -26,10 +26,32 @@ const messages = [
     {message: 'Hello, Alex', id: v1(), user: {id: v1(), name: 'Viktoria'}}
 ]
 
+const usersState = new Map();
+
 io.on("connection", (socketChannel) => {
 
-    socketChannel.on('client message sent', (message: string)=>{
-        let messageItem = {message: message, id: v1(), user: {id: v1(), name: 'Alex'}}
+    usersState.set(socketChannel, {id: v1(), name: 'Anonym'})
+
+    io.on('disconnect', ()=>{
+        usersState.delete(socketChannel);
+    })
+
+    socketChannel.on('client-name-sent', (name:string)=>{
+        if(typeof name !== 'string'){
+            return
+        }
+        const user = usersState.get(socketChannel)
+        user.name = name;
+    })
+
+    socketChannel.on('client-message-sent', (message: string)=>{
+        if(typeof message !== 'string'){
+            return
+        }
+
+        const user = usersState.get(socketChannel)
+
+        let messageItem = {message: message, id: v1(), user: {id: user.id, name: user.name}}
         messages.push(messageItem)
 
         io.emit('new-message-sent', messageItem)
