@@ -44,6 +44,10 @@ io.on("connection", (socketChannel) => {
         user.name = name;
     })
 
+    socketChannel.on('client-typed', ()=>{
+        io.emit('user-typing', usersState.get(socketChannel))
+    });
+
     socketChannel.on('client-message-sent', (message: string)=>{
         if(typeof message !== 'string'){
             return
