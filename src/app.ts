@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
         origin: "*",
     },
 });
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3900;
 
 app.use(cors())
 app.get('/', ((req, res) => {
@@ -36,7 +36,10 @@ io.on("connection", (socketChannel) => {
         usersState.delete(socketChannel);
     })
 
-    socketChannel.on('client-message-sent', (name:string)=>{
+    socketChannel.on('client-name-sent', (name:string)=>{
+        if(typeof name !== 'string'){
+            return
+        }
         const user = usersState.get(socketChannel)
         user.name = name;
     })
