@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
         origin: "*",
     },
 });
-const PORT = process.env.PORT || 3900;
+const PORT = process.env.PORT || 3500;
 
 app.use(cors())
 app.get('/', ((req, res) => {
@@ -43,6 +43,10 @@ io.on("connection", (socketChannel) => {
         const user = usersState.get(socketChannel)
         user.name = name;
     })
+
+    socketChannel.on('client-typed', ()=>{
+        io.emit('user-typing', usersState.get(socketChannel))
+    });
 
     socketChannel.on('client-message-sent', (message: string)=>{
         if(typeof message !== 'string'){
