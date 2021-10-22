@@ -45,12 +45,13 @@ io.on("connection", (socketChannel) => {
     })
 
     socketChannel.on('client-typed', ()=>{
-        io.emit('user-typing', usersState.get(socketChannel))
+        socketChannel.broadcast.emit('user-typing', usersState.get(socketChannel))
     });
 
-    socketChannel.on('client-message-sent', (message: string)=>{
-        if(typeof message !== 'string'){
-            return
+    socketChannel.on('client-message-sent', (message: string, successFn)=>{
+        if(typeof message !== 'string' || message.length > 20){
+            successFn("Message length should be less than 20 chars")
+            return;
         }
 
         const user = usersState.get(socketChannel)
@@ -59,6 +60,7 @@ io.on("connection", (socketChannel) => {
         messages.push(messageItem)
 
         io.emit('new-message-sent', messageItem)
+        successFn(null)
     })
     socketChannel.emit('init-messages-published', messages)
 
